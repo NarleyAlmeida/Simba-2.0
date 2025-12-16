@@ -12,7 +12,9 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { feriadosISO, prorrogsISO, stjRates, stfRates, funjusRates, ValorData } from './triario-data';
-import simbaLogo from './Dados/WhatsApp Image 2025-12-16 at 16.54.26.jpeg';
+
+// Placeholder for missing logo
+const simbaLogo = "https://placehold.co/400x400?text=Simba-JUD";
 
 type YesNo = 'sim' | 'não' | '';
 type TipoRecurso = 'Especial' | 'Extraordinário' | '';
