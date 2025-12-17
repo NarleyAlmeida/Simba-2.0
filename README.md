@@ -21,17 +21,15 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RjGL6xAfQtkkJD-zhr57V1
 
 ## Deploy to GitHub Pages
 
-The build output now lives in `docs/` (Vite `outDir`) with relative assets (`base: './'`), pronto para apontar o GitHub Pages para `/docs` na branch `main`.
+Build em `dist/` (Vite `base: './'`), pronto para Pages:
 
 1. Build: `npm run build`
-2. Publish `dist/` to a Pages branch (examples):
-   - `npm run deploy:gh` (usa `gh-pages` para enviar `docs/` à branch `gh-pages`)
-   - With Git: `git subtree push --prefix docs origin gh-pages`
-   - With `npx gh-pages`: `npx gh-pages -d docs`
-   - Ou configure Pages para branch `main`, pasta `/docs` (sem precisar da branch `gh-pages`)
-3. In the repo settings, point GitHub Pages to the `gh-pages` branch (or to `/dist` on `main` if you prefer that layout).
-4. **CI option:** push to `main` and let `.github/workflows/deploy.yml` build and deploy automatically to Pages.
+2. Publicar:
+   - `npm run deploy:gh` (envia `dist/` para branch `gh-pages`)
+   - ou `git subtree push --prefix dist origin gh-pages`
+   - ou configure Pages para Source: GitHub Actions (workflow `deploy.yml`)
+3. Em Settings → Pages, aponte para branch `gh-pages` (root) ou habilite “GitHub Actions”.
 
 Notes:
-- `npm run build` also writes `docs/404.html` (copy of `index.html`) to avoid reload 404s on GitHub Pages.
-- The Vite `base` is `./`, so assets load correctly even quando servido em `/repo-name/`.
+- `npm run build` também cria `dist/404.html` (SPA fallback).
+- `base: './'` carrega assets mesmo em subpath `/repo-name/`.
