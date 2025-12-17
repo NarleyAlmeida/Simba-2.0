@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "cp dist/index.html dist/404.html",
+    "postbuild": "cp docs/index.html docs/404.html",
     "preview": "vite preview",
-    "deploy:gh": "npm run build && gh-pages -d dist -b gh-pages"
+    "deploy:gh": "npm run build && gh-pages -d docs -b gh-pages"
   },
   "dependencies": {
     "@google/genai": "^1.33.0",
