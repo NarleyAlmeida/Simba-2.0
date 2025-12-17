@@ -686,6 +686,23 @@ const MetricCard = ({
   );
 };
 
+const WarningsCallout = ({ warnings }: { warnings: string[] }) => {
+  if (!warnings.length) return null;
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50/80 text-amber-900 shadow-sm p-4">
+      <div className="flex items-center gap-2 font-semibold text-sm">
+        <AlertTriangle className="w-4 h-4" />
+        <span>Pendências nesta etapa ({warnings.length})</span>
+      </div>
+      <ul className="mt-2 list-disc pl-5 space-y-1 text-sm">
+        {warnings.map((warning, idx) => (
+          <li key={idx}>{warning}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const App = () => {
   const STORAGE_KEY = 'triario_state_v1';
 
@@ -1751,7 +1768,10 @@ const App = () => {
     if (!content) return null;
 
     return (
-      <div className="space-y-4">{content}</div>
+      <div className="space-y-4">
+        <WarningsCallout warnings={warningsForStep} />
+        {content}
+      </div>
     );
   };
 
@@ -1767,6 +1787,8 @@ const App = () => {
       : outputs.controut === 'não'
       ? 'negative'
       : 'neutral';
+  const currentWarnings = stepWarnings[steps[step].id] || [];
+  const warningsTone: 'positive' | 'negative' = currentWarnings.length === 0 ? 'positive' : 'negative';
 
   return (
     <div className="min-h-screen page-bg text-slate-900">
@@ -1816,7 +1838,7 @@ const App = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
           <MetricCard
             label="Tempestividade"
             value={outputs.tempest.status === 'pendente' ? 'Pendente' : outputs.tempest.status}
@@ -1832,6 +1854,12 @@ const App = () => {
             label="Preparo devido"
             value={`R$ ${outputs.deverST.toFixed(2)}`}
             helper={`Funjus R$ ${outputs.deverFJ.toFixed(2)}`}
+          />
+          <MetricCard
+            label="Pendências da etapa"
+            value={`${currentWarnings.length} item${currentWarnings.length === 1 ? '' : 's'}`}
+            helper={currentWarnings.length ? 'Resolva para avançar com segurança' : 'Nada pendente aqui'}
+            tone={warningsTone}
           />
           <MetricCard
             label="Contrarrazões / MP"
@@ -1851,25 +1879,38 @@ const App = () => {
                 const Icon = s.icon;
                 const active = idx === step;
                 const done = idx < step;
+                const stepWarningsCount = stepWarnings[s.id]?.length || 0;
+                const showWarnings = idx <= step && stepWarningsCount > 0;
                 const stateClasses = active
                   ? 'border-slate-900 bg-slate-900 text-white shadow-lg shadow-slate-300/60'
+                  : showWarnings
+                  ? 'border-amber-200 bg-amber-50 text-amber-800 shadow-sm shadow-amber-100/70'
                   : done
                   ? 'border-emerald-200 bg-emerald-50 text-emerald-800 shadow-sm shadow-emerald-100/70'
                   : 'border-slate-200 bg-white text-slate-700 shadow-sm shadow-slate-100/80';
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={s.id}
-                    className={`flex items-center gap-2 px-3 py-3 rounded-xl border transition shadow-[0_4px_16px_-10px_rgba(0,0,0,0.25)] ${stateClasses}`}
+                    onClick={() => setStep(idx)}
+                    className={`flex items-center justify-between gap-3 px-3 py-3 rounded-xl border transition shadow-[0_4px_16px_-10px_rgba(0,0,0,0.25)] w-full text-left focus:outline-none focus:ring-2 focus:ring-slate-300 min-h-[54px] ${stateClasses}`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{s.label}</span>
-                  </div>
+                    <div className="flex items-center gap-2 truncate">
+                      <Icon className="w-4 h-4" />
+                      <span className="text-sm font-medium truncate">{s.label}</span>
+                    </div>
+                    {showWarnings && (
+                      <span className="flex-shrink-0 text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-white/60 border border-amber-200 text-amber-800">
+                        {stepWarningsCount} pend.
+                      </span>
+                    )}
+                  </button>
                 );
               })}
             </div>
           </div>
 
-            <div className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-6 shadow-xl shadow-slate-200/70">
+          <div className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-6 shadow-xl shadow-slate-200/70">
             {renderStep()}
             <div className="mt-6 flex items-center justify-between">
               <button
